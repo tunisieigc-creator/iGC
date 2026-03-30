@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="description" content="iGC - intelligence in General Consulting : expertise en ingénierie hydraulique, environnementale et infrastructures. Bureau d'études international.">
+    <meta name="keywords" content="ingénierie hydraulique, études environnementales, modélisation, barrages, AEP, Tunisie, international, Afrique">
+    <meta name="author" content="iGC Consulting">
+    <meta property="og:title" content="iGC - intelligence in General Consulting">
+    <meta property="og:description" content="Expertise en ingénierie hydraulique et environnementale">
+    <meta property="og:type" content="website">
+    <title>iGC - intelligence in General Consulting</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        /* (styles identiques à la version précédente) */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: #ffffff; color: #0f172a; line-height: 1.5; overflow-x: hidden; }
+        :root { --primary: #1e40af; --primary-dark: #0f2b6d; --primary-light: #3b82f6; --secondary: #f0f9ff; --accent: #06b6d4; --gray-50: #f8fafc; --gray-100: #f1f5f9; --gray-200: #e2e8f0; --gray-600: #475569; --gray-800: #1e293b; --shadow-sm: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.02); --shadow-md: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.02); --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.05), 0 10px 10px -5px rgba(0,0,0,0.01); --shadow-xl: 0 25px 50px -12px rgba(0,0,0,0.15); --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); --border-radius: 1.5rem; }
+        html { scroll-behavior: smooth; }
+        ::selection { background: var(--primary-light); color: white; }
+        h1, h2, h3, h4, .logo-text { font-weight: 800; letter-spacing: -0.02em; }
+        h1 { font-size: clamp(2.5rem, 8vw, 4rem); line-height: 1.2; }
+        h2 { font-size: clamp(2rem, 5vw, 2.8rem); margin-bottom: 1.5rem; position: relative; display: inline-block; }
+        h2:after { content: ''; position: absolute; bottom: -10px; left: 0; width: 70px; height: 4px; background: linear-gradient(90deg, var(--primary-light), var(--accent)); border-radius: 4px; }
+        .section-header { text-align: center; margin-bottom: 3rem; }
+        .section-header h2:after { left: 50%; transform: translateX(-50%); }
+        .section-header p { max-width: 700px; margin: 1rem auto 0; color: var(--gray-600); font-size: 1.1rem; }
+        .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 28px; background: var(--primary); color: white; border: none; border-radius: 50px; font-weight: 600; text-decoration: none; transition: var(--transition); cursor: pointer; box-shadow: var(--shadow-sm); font-size: 0.95rem; }
+        .btn:hover { background: var(--primary-dark); transform: translateY(-3px); box-shadow: var(--shadow-md); }
+        .btn-outline { background: transparent; border: 2px solid rgba(255,255,255,0.7); color: white; box-shadow: none; }
+        .btn-outline:hover { background: white; color: var(--primary-dark); border-color: white; }
+        header { background: rgba(255,255,255,0.8); backdrop-filter: blur(12px); box-shadow: 0 1px 2px rgba(0,0,0,0.02); position: fixed; width: 100%; z-index: 1000; transition: all 0.3s; }
+        header.scrolled { background: rgba(255,255,255,0.95); box-shadow: var(--shadow-sm); }
+        .header-container { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; max-width: 1280px; margin: 0 auto; width: 90%; }
+        .logo-text { font-size: 1.4rem; font-weight: 800; font-style: italic; background: linear-gradient(135deg, var(--primary-dark), var(--primary-light)); background-clip: text; -webkit-background-clip: text; color: transparent; }
+        nav ul { display: flex; gap: 2rem; list-style: none; }
+        nav ul li a { text-decoration: none; color: var(--gray-800); font-weight: 600; transition: var(--transition); font-size: 0.95rem; }
+        nav ul li a:hover, nav ul li a.active { color: var(--primary); }
+        .lang-switch { display: flex; gap: 8px; margin-left: 20px; }
+        .lang-btn { background: transparent; border: 1px solid var(--gray-200); padding: 6px 12px; border-radius: 40px; font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: 0.2s; color: var(--gray-800); }
+        .lang-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+        .mobile-menu { display: none; font-size: 1.6rem; cursor: pointer; color: var(--primary-dark); }
+        .hero { position: relative; padding: 180px 0 120px; overflow: hidden; background: linear-gradient(rgba(7, 27, 68, 0.75), rgba(7, 27, 68, 0.85)), url('Photos/Photo%20Introduction.png'); background-size: cover; background-position: center 30%; background-repeat: no-repeat; }
+        .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 40%, rgba(12,46,110,0.4), rgba(7,27,68,0.6)); pointer-events: none; }
+        .hero-content { position: relative; z-index: 2; max-width: 720px; animation: fadeUp 0.8s ease-out; }
+        .hero h1 { background: linear-gradient(135deg, #fff, #c7e9ff); background-clip: text; -webkit-background-clip: text; color: transparent; margin-bottom: 1.5rem; }
+        .hero p { font-size: 1.2rem; color: #e2edff; margin-bottom: 2rem; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .services-grid, .projects-grid { display: grid; gap: 2rem; }
+        .services-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+        .service-card { background: white; border-radius: var(--border-radius); padding: 2rem; text-align: center; transition: var(--transition); box-shadow: var(--shadow-sm); border: 1px solid rgba(0,0,0,0.03); }
+        .service-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-xl); border-color: transparent; }
+        .service-icon { width: 80px; height: 80px; background: linear-gradient(145deg, var(--primary-light), var(--accent)); border-radius: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; font-size: 2rem; box-shadow: 0 12px 20px -8px rgba(59,130,246,0.3); }
+        .project-filters { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem; }
+        .filter-btn { background: transparent; border: 1px solid var(--gray-200); padding: 0.5rem 1.2rem; border-radius: 40px; font-weight: 600; cursor: pointer; transition: 0.2s; color: var(--gray-600); }
+        .filter-btn.active, .filter-btn:hover { background: var(--primary); border-color: var(--primary); color: white; }
+        .sub-filters { display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem; }
+        .sub-filter-btn { background: var(--gray-100); border: 1px solid var(--gray-200); padding: 0.4rem 1rem; border-radius: 30px; font-weight: 500; cursor: pointer; transition: 0.2s; color: var(--gray-700); }
+        .sub-filter-btn.active, .sub-filter-btn:hover { background: var(--primary-light); border-color: var(--primary-light); color: white; }
+        .projects-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+        .project-card { background: white; border-radius: 1.2rem; overflow: hidden; box-shadow: var(--shadow-sm); transition: var(--transition); cursor: pointer; }
+        .project-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+        .project-image { height: 200px; background-size: cover; background-position: center; transition: transform 0.4s; }
+        .project-card:hover .project-image { transform: scale(1.02); }
+        .project-content { padding: 1.5rem; }
+        .project-category { display: inline-block; background: var(--gray-100); color: var(--primary); font-size: 0.7rem; font-weight: 600; padding: 0.2rem 0.8rem; border-radius: 20px; margin-bottom: 0.8rem; text-transform: capitalize; }
+        .project-title { font-size: 1.2rem; margin-bottom: 0.5rem; }
+        .project-client { font-weight: 600; color: var(--primary); margin-bottom: 0.5rem; text-transform: uppercase; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; padding: 2rem; backdrop-filter: blur(4px); }
+        .modal.active { display: flex; }
+        .modal-content { background: white; max-width: 800px; width: 90%; border-radius: 1.5rem; overflow: hidden; max-height: 90vh; overflow-y: auto; animation: fadeUp 0.3s; }
+        .modal-image { height: 300px; background-size: cover; background-position: center; }
+        .modal-body { padding: 2rem; }
+        .modal-close { float: right; font-size: 1.5rem; cursor: pointer; background: var(--gray-100); width: 40px; height: 40px; border-radius: 40px; display: flex; align-items: center; justify-content: center; margin: 1rem; }
+        .modal-close:hover { background: var(--gray-200); }
+        .partner-ribbon { width: 100%; overflow: hidden; background: white; padding: 20px 0; position: relative; box-shadow: var(--shadow-sm); }
+        .partner-track { display: flex; width: fit-content; animation: scrollRibbon 30s linear infinite; }
+        .partner-track:hover { animation-play-state: paused; }
+        .partner-logo { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; min-width: 150px; margin: 0 20px; background: transparent; transition: transform 0.2s; }
+        .partner-logo img { max-width: 100px; max-height: 70px; object-fit: contain; filter: grayscale(0%); }
+        @keyframes scrollRibbon { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        @media (max-width: 768px) { .partner-logo { min-width: 120px; margin: 0 12px; } .partner-logo img { max-width: 70px; max-height: 50px; } .partner-track { animation-duration: 20s; } }
+        .contact-content { display: flex; gap: 3rem; flex-wrap: wrap; }
+        .contact-info, .contact-form { flex: 1; min-width: 280px; }
+        .contact-item { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.8rem; }
+        .contact-icon { width: 48px; height: 48px; background: var(--gray-100); border-radius: 28px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 1.2rem; }
+        .form-control { width: 100%; padding: 14px 18px; border: 1.5px solid var(--gray-200); border-radius: 60px; transition: 0.2s; font-size: 0.95rem; }
+        textarea.form-control { border-radius: 24px; resize: vertical; }
+        .form-control:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+        .gdpr-check { display: flex; align-items: center; gap: 0.5rem; margin: 1rem 0; }
+        .back-to-top { position: fixed; bottom: 2rem; right: 2rem; background: var(--primary); color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; visibility: hidden; transition: var(--transition); z-index: 99; box-shadow: var(--shadow-md); }
+        .back-to-top.show { opacity: 1; visibility: visible; }
+        .back-to-top:hover { background: var(--primary-dark); transform: translateY(-3px); }
+        footer { background: #0a2540; color: white; padding: 60px 0 20px; }
+        .footer-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2rem; margin-bottom: 3rem; }
+        .footer-logo h2 { color: white; font-size: 1.6rem; font-style: italic; font-weight: 800; }
+        .footer-logo h2:after { display: none; }
+        .footer-links ul, .footer-services ul { list-style: none; }
+        .footer-links li, .footer-services li { margin-bottom: 0.8rem; }
+        .footer-links a, .footer-services a { color: #b9d0f0; text-decoration: none; transition: 0.2s; }
+        .footer-links a:hover, .footer-services a:hover { color: white; padding-left: 4px; }
+        .social-links { display: flex; gap: 12px; margin-top: 1rem; }
+        .social-links a { background: rgba(255,255,255,0.1); width: 38px; height: 38px; border-radius: 40px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .footer-bottom { text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; font-size: 0.85rem; }
+        @media (max-width: 992px) { .header-container nav { display: none; } .mobile-menu { display: block; } .lang-switch { margin-left: auto; margin-right: 20px; } .contact-content { flex-direction: column; } }
+        .mobile-nav { position: fixed; top: 0; right: -100%; width: 280px; height: 100%; background: white; z-index: 1100; padding: 5rem 2rem; transition: 0.3s; box-shadow: -5px 0 20px rgba(0,0,0,0.1); }
+        .mobile-nav.active { right: 0; }
+        .mobile-nav ul li { margin: 1.5rem 0; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1050; opacity: 0; visibility: hidden; transition: 0.3s; }
+        .overlay.active { opacity: 1; visibility: visible; }
+        .animate-on-scroll { opacity: 0; transform: translateY(30px); transition: all 0.7s ease-out; }
+        .animate-on-scroll.animate { opacity: 1; transform: translateY(0); }
+        .btn-pdf { background: var(--primary-light); margin-top: 0.5rem; margin-right: 0.5rem; }
+        .about-text p { text-align: justify; margin-bottom: 1rem; }
+        .map-container { border-radius: var(--border-radius); overflow: hidden; box-shadow: var(--shadow-lg); margin-top: 2rem; border: 1px solid rgba(0,0,0,0.05); background: #f4f7fb; }
+        #africaMap { height: 550px; width: 100%; background: #eef2f7; }
+        .country-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem 1.8rem; margin-top: 20px; padding: 12px 20px; background: white; border-radius: 60px; box-shadow: var(--shadow-sm); width: fit-content; margin-left: auto; margin-right: auto; font-size: 0.9rem; font-weight: 500; color: var(--gray-800); }
+        .country-legend span { display: inline-flex; align-items: center; gap: 6px; background: var(--gray-100); padding: 4px 12px; border-radius: 30px; }
+        .country-legend i { color: #fbbf24; font-size: 0.85rem; }
+        .custom-star-marker { background: transparent; border: none; }
+        .whatsapp-link { color: var(--primary); text-decoration: none; font-weight: 600; }
+        .whatsapp-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<header id="header">
+    <div class="header-container">
+        <div class="logo-text"><i>iGC : intelligence in General Consulting</i></div>
+        <nav>
+            <ul>
+                <li><a href="#home" data-fr="Accueil" data-en="Home">Accueil</a></li>
+                <li><a href="#about" data-fr="À propos" data-en="About">À propos</a></li>
+                <li><a href="#services" data-fr="Services" data-en="Services">Services</a></li>
+                <li><a href="#references" data-fr="Réalisations" data-en="Achievements">Réalisations</a></li>
+                <li><a href="#intervention-map" data-fr="Carte Afrique" data-en="Africa Map">Carte Afrique</a></li>
+                <li><a href="#partners" data-fr="Partenaires" data-en="Partners">Partenaires</a></li>
+                <li><a href="#contact" data-fr="Contact" data-en="Contact">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="lang-switch">
+            <button class="lang-btn active" data-lang="fr">FR</button>
+            <button class="lang-btn" data-lang="en">EN</button>
+        </div>
+        <div class="mobile-menu"><i class="fas fa-bars"></i></div>
+    </div>
+</header>
+<div class="mobile-nav"><div class="close-menu"><i class="fas fa-times"></i></div><ul><li><a href="#home">Accueil</a></li><li><a href="#about">À propos</a></li><li><a href="#services">Services</a></li><li><a href="#references">Réalisations</a></li><li><a href="#intervention-map">Carte Afrique</a></li><li><a href="#partners">Partenaires</a></li><li><a href="#contact">Contact</a></li></ul></div>
+<div class="overlay"></div>
+
+<section class="hero" id="home">
+    <div class="container" style="width:90%; max-width:1280px; margin:0 auto;">
+        <div class="hero-content"><h1 data-fr="Bureau d'études en hydraulique et environnement" data-en="Engineering office in hydraulics and environment">Bureau d'études en hydraulique et en environnement</h1>
+        <p data-fr="Depuis 2018, iGC offre des solutions innovantes en génie rural, hydraulique et environnement pour des projets durables en Tunisie et à l'international." data-en="Since 2018, iGC offers innovative solutions in rural engineering, hydraulics and environment for sustainable projects in Tunisia and internationally.">Depuis 2018, iGC offre des solutions innovantes en génie rural, hydraulique et environnement pour des projets durables en Tunisie et à l'international.</p>
+        <div class="hero-btns"><a href="#references" class="btn" data-fr="Voir nos projets" data-en="View our projects">Voir nos projets</a><a href="#contact" class="btn btn-outline" data-fr="Nous contacter" data-en="Contact us">Nous contacter</a></div></div>
+    </div>
+</section>
+
+<section class="about" id="about"><div class="container" style="width:90%; max-width:1280px; margin:0 auto; padding: 100px 0;"><div style="display: flex; gap: 3rem; flex-wrap: wrap; align-items: center;"><div style="flex:1" class="about-text"><h2 data-fr="À propos de nous" data-en="About us">À propos de nous</h2><p data-fr="Fondé en janvier 2018 par l'ingénieur Seifeddine El Amri, diplômé de l'ENIT et de l'INAT, avec plus de 23 ans d'expérience en hydraulique et environnement, iGC est un bureau d'études pluridisciplinaire." data-en="Founded in January 2018 by engineer Seifeddine El Amri, graduate of ENIT and INAT, with over 23 years of experience in hydraulics and environment, iGC is a multidisciplinary engineering office.">Fondé en janvier 2018 par l'ingénieur Seifeddine El Amri, diplômé de l'ENIT et de l'INAT, avec plus de 23 ans d'expérience en hydraulique et environnement, iGC est un bureau d'études pluridisciplinaire.</p><p data-fr="Nos secteurs d'activité couvrent le développement agricole et rural, l'hydraulique, l'environnement, les infrastructures urbaines et rurales (routes, ouvrages, barrages), les bâtiments et l'économie générale." data-en="Our fields of activity cover agricultural and rural development, hydraulics, environment, urban and rural infrastructure (roads, structures, dams), buildings and general economics.">Nos secteurs d'activité couvrent le développement agricole et rural, l'hydraulique, l'environnement, les infrastructures urbaines et rurales (routes, ouvrages, barrages), les bâtiments et l'économie générale.</p><p data-fr="Membre de l'ASTEE-France, nous investissons dans la R&D en mécanique des fluides et des structures. Nous mettons en œuvre une stratégie linguistique (anglais, français, arabe) et valorisons l'économie de la connaissance via des outils de modélisation numérique et une équipe d'experts internationaux." data-en="Member of ASTEE-France, we invest in R&D in fluid mechanics and structures. We implement a linguistic strategy (English, French, Arabic) and promote the knowledge economy through numerical modeling tools and a team of international experts.">Membre de l'ASTEE-France, nous investissons dans la R&D en mécanique des fluides et des structures. Nous mettons en œuvre une stratégie linguistique (anglais, français, arabe) et valorisons l'économie de la connaissance via des outils de modélisation numérique et une équipe d'experts internationaux.</p><a href="#contact" class="btn" data-fr="Nous contacter" data-en="Contact us">Nous contacter</a></div><div style="flex:1; border-radius: 2rem; overflow: hidden; box-shadow: var(--shadow-lg);"><img src="Photos/Photo%20Introduction.png" alt="iGC Consulting" style="width:100%; height:100%; object-fit:cover;" loading="lazy"></div></div></div></section>
+
+<section class="services" id="services" style="background: var(--gray-50);"><div class="container" style="width:90%; max-width:1280px; margin:0 auto; padding: 100px 0;"><div class="section-header"><h2 data-fr="Nos Services" data-en="Our Services">Nos Services</h2><p data-fr="Nous proposons une gamme complète de services en hydraulique et environnement" data-en="We offer a complete range of services in hydraulic and environmental engineering">Nous proposons une gamme complète de services en ingénierie hydraulique et environnementale</p></div><div class="services-grid"><div class="service-card animate-on-scroll"><div class="service-icon"><i class="fas fa-tint"></i></div><h3 data-fr="Modélisation Hydraulique" data-en="Hydraulic Modeling">Modélisation Hydraulique</h3><p data-fr="Études avancées, simulations et modélisation des réseaux, barrages, canaux, et Procédés de Traitement des eaux (EPANET, SIC, MECAFLUX, FLOW3D)." data-en="Advanced studies, simulations and modeling of networks, dams and canals (EPANET, SIC, MECAFLUX).">Études avancées, simulations et modélisation des réseaux, barrages et canaux (EPANET, SIC, MECAFLUX).</p></div><div class="service-card animate-on-scroll"><div class="service-icon"><i class="fas fa-leaf"></i></div><h3 data-fr="Études Environnementales" data-en="Environmental Studies">Études Environnementales</h3><p data-fr="Évaluations d'impact, suivi des écosystèmes lacustres, contrôle de la qualité de l'eau, des sédiments et modélisation écologique des écosystèmes lagunaires et marin." data-en="Impact assessments, monitoring of lake ecosystems, water and sediment quality control.">Évaluations d'impact, suivi des écosystèmes lacustres, contrôle de la qualité de l'eau, des sédiments, élaboration des PGES, et Etudes d'Impacts Environnementales.</p></div><div class="service-card animate-on-scroll"><div class="service-icon"><i class="fas fa-water"></i></div><h3 data-fr="Gestion des Ressources en Eau" data-en="Water Resources Management">Gestion des Ressources en Eau</h3><p data-fr="Plans directeurs AEP, études de faisabilité, optimisation des ressources hydriques et transferts d'eau." data-en="Master plans for drinking water supply, feasibility studies, optimization of water resources and water transfers.">Plans directeurs AEP, études de faisabilité, optimisation des ressources hydriques et transferts d'eau.</p></div><div class="service-card animate-on-scroll"><div class="service-icon"><i class="fas fa-drafting-compass"></i></div><h3 data-fr="Conception des Ouvrages Hydrauliques" data-en="Structure Design">Conception d'Ouvrages</h3><p data-fr="Études APS, APD, DAO de conception des barrages, stations de pompage, réseaux d'adduction,  périmètres irrigués, et Stations de Traitement des Eaux." data-en="Preliminary, detailed and execution studies for dams, pumping stations, water supply networks and irrigated perimeters.">Études APS, APD, DAO pour barrages, stations de pompage, réseaux d'adduction et périmètres irrigués.</p></div><div class="service-card animate-on-scroll"><div class="service-icon"><i class="fas fa-hard-hat"></i></div><h3 data-fr="Supervision de Travaux" data-en="Works Supervision">Supervision de Travaux</h3><p data-fr="Contrôle et suivi d'exécution selon normes FIDIC, supervision de réseaux d'eau potable et d'irrigation." data-en="Control and monitoring of execution according to FIDIC standards, supervision of drinking water and irrigation networks.">Contrôle et suivi d'exécution des Grands projets en Hydrauliques selon normes FIDIC, supervision de réseaux d'eau potable et d'irrigation, des Barrages, des STEP, et des Ports.</p></div><div class="service-card animate-on-scroll"><div class="service-icon"><i class="fas fa-chart-line"></i></div><h3 data-fr="Assistance Technique" data-en="Technical Assistance">Assistance Technique</h3><p data-fr="Accompagnement des maîtres d'ouvrages, analyses technico-financières, expertises internationales." data-en="Support for project owners, technical and financial analyses, international expertise.">Accompagnement des maîtres d'ouvrage, analyses technico-financières, expertise internationale.</p></div></div></div></section>
+
+<section class="references" id="references"><div class="container" style="width:90%; max-width:1280px; margin:0 auto; padding: 100px 0;"><div class="section-header"><h2 data-fr="Nos Réalisations" data-en="Our Achievements">Nos Réalisations</h2><p data-fr="Projets nationaux et internationaux en hydraulique, environnement et infrastructures" data-en="National and international projects in hydraulics, environment and infrastructure">Projets nationaux et internationaux en hydraulique, environnement et infrastructures</p></div>
+    <div class="project-filters" id="categoryFilters">
+        <button class="filter-btn active" data-cat="water">Hydraulique</button>
+        <button class="filter-btn" data-cat="environment">Environnement</button>
+        <button class="filter-btn" data-cat="infrastructure">Infrastructures</button>
+    </div>
+    <div class="sub-filters" id="scopeFilters" style="display: none;">
+        <button class="sub-filter-btn" data-scope="national">National</button>
+        <button class="sub-filter-btn" data-scope="international">International</button>
+    </div>
+    <div class="projects-grid" id="projectsGrid"></div>
+</div></section>
+
+<section class="intervention-map" id="intervention-map" style="padding: 100px 0; background: var(--gray-50);"><div class="container" style="width:90%; max-width:1280px; margin:0 auto;"><div class="section-header"><h2 data-fr="Carte des Interventions d’iGC en Afrique" data-en="Map of iGC Interventions in Africa">Carte des Interventions d’iGC en Afrique</h2><p data-fr="Empreinte d’iGC à Travers l’Afrique" data-en="iGC Footprint Across Africa">Empreinte d’iGC à Travers l’Afrique</p></div><div class="map-container"><div id="africaMap"></div></div><div id="countryLegendContainer" class="country-legend"></div></div></section>
+
+<section class="partners" id="partners" style="padding: 60px 0;"><div class="section-header"><h2 data-fr="Nos Partenaires & Clients" data-en="Our Partners & Clients">Nos Partenaires & Clients</h2><p data-fr="Ils nous font confiance" data-en="They trust us">Ils nous font confiance</p></div><div class="partner-ribbon"><div class="partner-track" id="partnerTrack"></div></div></section>
+
+<section class="contact" id="contact"><div class="container" style="width:90%; max-width:1280px; margin:0 auto; padding: 100px 0;"><div class="section-header"><h2 data-fr="Contactez-nous" data-en="Contact us">Contactez-nous</h2><p data-fr="Discutons de vos projets en ingénierie hydraulique et environnementale" data-en="Let's discuss your hydraulic and environmental engineering projects">Discutons de vos projets en ingénierie hydraulique et environnementale</p></div><div class="contact-content"><div class="contact-info"><div class="contact-item"><div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div><div><h3 data-fr="Adresse" data-en="Address">Adresse</h3><p>B03-NOUR RESIDENCE -118 Rue IBN KHALDOUN- ARIANA CITY-2080-TUNISIA</p></div></div><div class="contact-item"><div class="contact-icon"><i class="fas fa-phone"></i></div><div><h3 data-fr="Téléphone / WhatsApp" data-en="Phone / WhatsApp">Téléphone / WhatsApp</h3><p>+216 96 857 189</p><p>+216 56 489 222</p><p><a href="https://wa.me/21696857189" target="_blank" class="whatsapp-link">+216 96 857 189 (WhatsApp)</a></p></div></div><div class="contact-item"><div class="contact-icon"><i class="fas fa-envelope"></i></div><div><h3 data-fr="Email" data-en="Email">Email</h3><p>igc.tunisie@gmail.com</p></div></div><div class="contact-item"><div class="contact-icon"><i class="fas fa-clock"></i></div><div><h3 data-fr="Horaires" data-en="Opening hours">Horaires</h3><p data-fr="Lundi - Vendredi: 8h00 - 18h00" data-en="Monday - Friday: 8:00 AM - 6:00 PM">Lundi - Vendredi: 8h00 - 18h00</p><p data-fr="Samedi: 8h00 - 13h00" data-en="Saturday: 8:00 AM - 1:00 PM">Samedi: 8h00 - 13h00</p></div></div><div class="contact-item"><div class="contact-icon"><i class="fas fa-file-pdf"></i></div><div><h3 data-fr="Brochures" data-en="Brochures">Brochures</h3><div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem;"><button class="btn btn-pdf" id="viewBrochureFr" style="background: var(--primary-light); padding: 8px 16px; font-size:0.9rem;"><i class="fas fa-file-pdf"></i> <span data-fr="Visualiser (Français)" data-en="View (French)">Visualiser (Français)</span></button><button class="btn btn-pdf" id="viewBrochureEn" style="background: var(--primary-light); padding: 8px 16px; font-size:0.9rem;"><i class="fas fa-file-pdf"></i> <span data-fr="Visualiser (Anglais)" data-en="View (English)">Visualiser (Anglais)</span></button></div></div></div></div><div class="contact-form"><form id="contactForm" action="mailto:igc.tunisie@gmail.com" method="post" enctype="text/plain"><div class="form-group"><label data-fr="Nom complet" data-en="Full name">Nom complet</label><input type="text" class="form-control" id="name" name="name" required></div><div class="form-group"><label data-fr="Adresse email" data-en="Email address">Adresse email</label><input type="email" class="form-control" id="email" name="email" required></div><div class="form-group"><label data-fr="Sujet" data-en="Subject">Sujet</label><input type="text" class="form-control" id="subject" name="subject" required></div><div class="form-group"><label data-fr="Message" data-en="Message">Message</label><textarea class="form-control" id="message" name="message" rows="4" required></textarea></div><div class="gdpr-check"><input type="checkbox" id="gdpr" required><label for="gdpr" data-fr="J'accepte que mes données soient utilisées pour me recontacter." data-en="I agree that my data will be used to contact me.">J'accepte que mes données soient utilisées pour me recontacter.</label></div><button type="submit" class="btn" data-fr="Envoyer le message" data-en="Send message">Envoyer le message</button><p class="form-note" style="font-size: 0.8rem; margin-top: 0.5rem; color: var(--gray-600);">📧 L'envoi ouvrira votre client de messagerie. Merci de bien vouloir confirmer l'envoi.</p></form></div></div></div></section>
+
+<footer><div class="container" style="width:90%; max-width:1280px; margin:0 auto;"><div class="footer-content"><div class="footer-logo"><h2><i>iGC : intelligence in General Consulting</i></h2><p data-fr="Ingénierie hydraulique, environnement, développement rural et infrastructures durables." data-en="Hydraulic engineering, environment, rural development and sustainable infrastructure.">Ingénierie hydraulique, environnement, développement rural et infrastructures durables.</p><div class="social-links"><a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a><a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a></div></div><div class="footer-links"><h3 data-fr="Liens rapides" data-en="Quick links">Liens rapides</h3><ul><li><a href="#home">Accueil</a></li><li><a href="#about">À propos</a></li><li><a href="#services">Services</a></li><li><a href="#references">Réalisations</a></li><li><a href="#intervention-map">Carte Afrique</a></li><li><a href="#contact">Contact</a></li></ul></div><div class="footer-services"><h3 data-fr="Domaines" data-en="Domains">Domaines</h3><ul><li><a href="#">Hydraulique</a></li><li><a href="#">Environnement</a></li><li><a href="#">Infrastructures</a></li></ul></div><div class="footer-contact"><h3 data-fr="Contact" data-en="Contact">Contact</h3><p><i class="fas fa-map-marker-alt"></i> Tunis, Tunisie</p><p><i class="fas fa-phone"></i> +216 96 857 189</p><p><i class="fas fa-envelope"></i> igc.tunisie@gmail.com</p></div></div><div class="footer-bottom"><p>© 2025 iGC - intelligence in General Consulting. Tous droits réservés.</p></div></div></footer>
+
+<div class="back-to-top" id="backToTop"><i class="fas fa-arrow-up"></i></div>
+<div id="projectModal" class="modal"><div class="modal-content"><div class="modal-close"><i class="fas fa-times"></i></div><div class="modal-image"></div><div class="modal-body"><h3 class="modal-title"></h3><p class="modal-client"></p><p class="modal-desc"></p><p class="modal-year"></p><p class="modal-location"></p></div></div></div>
+<div id="pdfModal" class="modal pdf-modal"><div class="modal-content"><div class="modal-close"><i class="fas fa-times"></i></div><div class="modal-body"><iframe id="pdfIframe" src="" style="width:100%; height:100%; border:none;"></iframe></div></div></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// --------------------------------------------------------------
+// PROJETS (bilingues français/anglais)
+// --------------------------------------------------------------
+const projectsRaw = [
+  { 
+    category: "environment", img: "Photos/CONTROL%20OF%20THE%20ECOSYSTEM%20OF%20THE%20BIZERTIAN%20LAKE.png", year: "2021-2023",
+    fr: { title: "Contrôle de l'écosystème du lac de Bizerte", client: "BERD / ANPE", shortDesc: "Suivi qualité eau, phytoplancton, sédiments, modélisation horizon 2050.", longDesc: "Assistance Technique à l'ANPE pour le développement et la mise en place d'une stratégie de suivi environnementale du Lac de Bizerte. Études de l'écosystème : suivi de la qualité des eaux, étude de la végétation et des phytoplanctons, étude du macrofaune benthique, étude des sédiments du fond du Lac, modélisation de l'écosystème à l'horizon 2050. Contrôle de la qualité des eaux des trois stations d'épuration de Bizerte (26 000 m³/j), Menzel Bourguiba (14 000 m³/j) et Mateur (7 000 m³/j).", location: "Bizerte, Tunisie" },
+    en: { title: "Ecosystem Monitoring of Lake Bizerte", client: "EBRD / ANPE", shortDesc: "Water quality monitoring, phytoplankton, sediments, modeling up to 2050.", longDesc: "Technical assistance to ANPE for the development and implementation of an environmental monitoring strategy for Lake Bizerte. Ecosystem studies: water quality monitoring, vegetation and phytoplankton study, benthic macrofauna study, lakebed sediment study, ecosystem modeling up to 2050. Quality control of effluents from three wastewater treatment plants in Bizerte (26,000 m³/d), Menzel Bourguiba (14,000 m³/d) and Mateur (7,000 m³/d).", location: "Bizerte, Tunisia" }
+  },
+  { 
+    category: "environment", img: "Photos/CONTROL%20OF%20THE%20ECOSYSTEM%20OF%20THE%20TUNISIAN%20SOUTH%20LAKE.jpg", year: "2022",
+    fr: { title: "Contrôle de l'écosystème du lac sud de Tunis", client: "SEPTS (Société d'études et de Promotion du Lac Sud)", shortDesc: "Suivi des eaux, sédiments, faune et modélisation.", longDesc: "Études de l'écosystème du Lac Sud : suivi de la qualité des eaux, étude de la végétation et des phytoplanctons, étude du macrofaune benthique, étude des sédiments du fond du Lac, approche expérimentale pour la modélisation de l'écosystème du Lac Sud à l'horizon 2050.", location: "Tunis, Tunisie" },
+    en: { title: "Ecosystem Monitoring of South Lake of Tunis", client: "SEPTS (South Lake Study and Promotion Company)", shortDesc: "Water, sediment, fauna monitoring and modeling.", longDesc: "Ecosystem studies of South Lake: water quality monitoring, vegetation and phytoplankton study, benthic macrofauna study, lakebed sediment study, experimental approach for modeling the South Lake ecosystem up to 2050.", location: "Tunis, Tunisia" }
+  },
+  { 
+    category: "water", img: "Photos/Evaluation%20of%20the%20water%20resources%20at%20the%20Land%20of%20the%20educational%20farm%20of%20the%20agricultural%20training%20secondary%20school%20in%20cattle%20breeding%20in%20Thibar%20and%20proposal%20of%20a%20rehabilitation.jpg", year: "2020",
+    fr: { title: "Évaluation des ressources en eau - Thibar", client: "GIZ", shortDesc: "Diagnostic et plan de réhabilitation du système d'irrigation et station de pompage.", longDesc: "Évaluation des ressources en eau au niveau de la ferme pédagogique du lycée sectoriel de Formation Agricole en élevage Bovin de Thibar par rapport aux besoins, ainsi que l'état du système d'irrigation et proposition d'un plan d'action de réhabilitation.", location: "Thibar, Tunisie" },
+    en: { title: "Water Resources Assessment - Thibar", client: "GIZ", shortDesc: "Diagnosis and rehabilitation plan for the irrigation system and pumping station.", longDesc: "Assessment of water resources at the educational farm of the Thibar Agricultural Training Secondary School for cattle breeding, and evaluation of the irrigation system's condition, with proposal of a rehabilitation action plan.", location: "Thibar, Tunisia" }
+  },
+  { 
+    category: "water", img: "Photos/Project%20to%20improve%20the%20rate%20of%20drinking%20water%20supply%20in%20rural%20areas%20of%20the%20Governorate%20of%20Bizerte.jpg", year: "2021-2024",
+    fr: { title: "Supervision AEP Bizerte (300 km)", client: "SONEDE", shortDesc: "Supervision de pose de 300 km de conduites et station de traitement.", longDesc: "Projet d'amélioration du taux de desserte en eau potable dans le milieu rural du Gouvernorat de Bizerte. Supervision des travaux de pose de 300 km de pipes afin de transferer 100 000 m³/jour d'eau potable et une station de traitement.", location: "Bizerte, Tunisie" },
+    en: { title: "Drinking Water Supply Supervision - Bizerte (300 km)", client: "SONEDE", shortDesc: "Supervision of 300 km pipe laying and a treatment plant.", longDesc: "Project to improve drinking water supply coverage in rural areas of Bizerte Governorate. Supervision of the laying of 300 km of pipes to transfer 100,000 m³/day of drinking water, including a treatment plant.", location: "Bizerte, Tunisia" }
+  },
+  { 
+    category: "water", img: "Photos/Water%20Supply%20Master%20Plans%20Design%20of%20the%20Water%20Supply%20Master%20plans%20of%20big%20and%20small%20 cities,.jpg", year: "2022",
+    fr: { title: "Plans directeurs AEP - Kasserine", client: "Direction Régionale du Développement Agricole", shortDesc: "Modélisation EPANET des réseaux urbains et ruraux.", longDesc: "Études des plans directeurs d'AEP des grandes villes, moyennes, et dans les zones rurales, moyennant le logiciel de modélisation et de calage des réseaux hydraulique : EPANET. Cas de la ville de Kasserine et ses environs.", location: "Kasserine, Tunisie" },
+    en: { title: "Water Supply Master Plans - Kasserine", client: "Regional Agricultural Development Directorate", shortDesc: "EPANET modeling of urban and rural networks.", longDesc: "Development of water supply master plans for large and medium towns and rural areas, using EPANET hydraulic modeling and calibration software. Case of Kasserine city and its surroundings.", location: "Kasserine, Tunisia" }
+  },
+  { 
+    category: "water", img: "Photos/HYDRAULIC%20TRANSFER.jpg", year: "2019-2021",
+    fr: { title: "Transfert hydraulique Medjerda-Cap Bon", client: "DGBGTH / AHT / SCP / COBA", shortDesc: "Modélisation du canal de 120 km (28 m³/s).", longDesc: "Hydraulic modelling of the Medjerdah-Cap Bon Channel (120 km, flow: 28 m³/s). Utilisation du logiciel SIC pour la modélisation hydraulique en canaux et conduites.", location: "Tunisie" },
+    en: { title: "Medjerda-Cap Bon Hydraulic Transfer", client: "DGBGTH / AHT / SCP / COBA", shortDesc: "Modeling of the 120 km canal (28 m³/s).", longDesc: "Hydraulic modeling of the Medjerda-Cap Bon Channel (120 km, flow: 28 m³/s). Use of SIC software for hydraulic modeling in canals and pipes.", location: "Tunisia" }
+  },
+  { 
+    category: "water", img: "Photos/REHABILITATION%20OF%20THE%20BEN%20MANSOUR%20PUMPING%20COMPLEX%20AND%20WATER%20SUPPLY%20TRANSFERT%20TO%20BNINA%20AND%20COUFIA.jpg", year: "2021-2022",
+    fr: { title: "Réhabilitation du complexe Ben Mansour - Libye", client: "GWSC (Compagnie Générale de l'Eau et de l'Assainissement)", shortDesc: "Diagnostic, études de faisabilité, conception détaillée du transfert 500 l/s.", longDesc: "Réhabilitation du complexe de pompage AEP de Ben Mansour et adduction d'eau vers les localités de Bnina et Coufia (Transfert 500 l/s). Missions : diagnostic du complexe de pompage, études de faisabilité, APD et DAO de réhabilitation.", location: "Benghazi, Libye" },
+    en: { title: "Rehabilitation of Ben Mansour Complex - Libya", client: "GWSC (General Water and Sanitation Company)", shortDesc: "Diagnosis, feasibility studies, detailed design of 500 l/s transfer.", longDesc: "Rehabilitation of the Ben Mansour drinking water pumping complex and water supply to Bnina and Coufia (500 l/s transfer). Tasks: diagnosis of the pumping complex, feasibility studies, preliminary and detailed design for rehabilitation.", location: "Benghazi, Libya" }
+  },
+  { 
+    category: "infrastructure", img: "Photos/DEVELOPMENT%20OF%20THE%20PORT%20OYO.png", year: "2022",
+    fr: { title: "Port d'Oyo - Congo", client: "Direction Générale des Grands Travaux", shortDesc: "Conception des systèmes d'eau potable, incendie et assainissement.", longDesc: "Development of the port of Oyo. Exécutive design of fire protection water supply, sanitation systems, and environmental monitoring.", location: "Oyo, Congo" },
+    en: { title: "Port of Oyo - Congo", client: "General Directorate of Major Works", shortDesc: "Design of water supply, fire protection and sanitation systems.", longDesc: "Development of the port of Oyo. Detailed design of fire protection water supply, sanitation systems, and environmental monitoring.", location: "Oyo, Congo" }
+  },
+  { 
+    category: "water", img: "Photos/Excerpt%20from%20the%20Project%20YAOUNDE.jpg", year: "2020-2023",
+    fr: { title: "Plans directeurs AEP - Cameroun, Congo, Guinée, Côte d'Ivoire", client: "CAMWATER / SODECI", shortDesc: "Études pour Yaoundé (2M hab.), Brazzaville, Pointe-Noire, Boké, Korhogo.", longDesc: "Études des plans directeurs, APD et DAO des projets d'AEP dans les grandes villes de population supérieure à 1 million d'habitants (Yaoundé, Brazzaville, Pointe-Noire) et localités plus petites (Boké, Korhogo). Utilisation d'EPANET et ARCGIS MAP.", location: "Afrique" },
+    en: { title: "Water Supply Master Plans - Cameroon, Congo, Guinea, Ivory Coast", client: "CAMWATER / SODECI", shortDesc: "Studies for Yaoundé (2M inh.), Brazzaville, Pointe-Noire, Boké, Korhogo.", longDesc: "Master plans, preliminary and detailed design for water supply projects in major cities with populations over 1 million (Yaoundé, Brazzaville, Pointe-Noire) and smaller towns (Boké, Korhogo). Use of EPANET and ArcGIS.", location: "Africa" }
+  },
+  { 
+    category: "environment", img: "Photos/Ecosystem%20Resilience%20Studies.jpg", year: "2023",
+    fr: { title: "Résilience écosystémique - Lac Guier, Sénégal", client: "Lake Guier Office / SCP-France", shortDesc: "Irrigation de 16 000 ha, AEP de 4000 habitants.", longDesc: "Études de faisabilité, APS et APD du Projet de renforcement de la résilience des écosystèmes du Ferlo (PREFERLO). Conception des scénarios de développement et comparaison, irrigation de 16 000 ha pour l'agrobusiness et alimentation en eau potable de 4 000 habitants.", location: "Sénégal" },
+    en: { title: "Ecosystem Resilience - Lake Guier, Senegal", client: "Lake Guier Office / SCP-France", shortDesc: "Irrigation of 16,000 ha, drinking water for 4,000 inhabitants.", longDesc: "Feasibility studies, preliminary and detailed design for the Ferlo Ecosystem Resilience Strengthening Project (PREFERLO). Development and comparison of scenarios, irrigation of 16,000 ha for agribusiness and drinking water supply for 4,000 inhabitants.", location: "Senegal" }
+  },
+  { 
+    category: "environment", img: "Photos/Development%20of%20an%20Anti-erosion%20Development%20Plan%20for%20Kef%20RAII%20and%20Environmental%20Impact%20Studies%20of%20the%20two%20hill%20lakes%20studied%20on%20Oued%20Sahbi%20and%20Oued%20El%20GARIA%20in%20the%20Delegation%20of%20Rouhia%20–SILIANA.jpg", year: "2023",
+    fr: { title: "Aménagement antiérosif Kef RAII - Siliana", client: "PROFITS / FIDA", shortDesc: "Plan d'aménagement antiérosif, études d'impact des lacs collinaires.", longDesc: "Elaboration d'un plan d'aménagement antiérosif du Kef RAII et études d'impacts sur l'environnement des deux lacs collinaires étudiés sur Oued Sahbi et Oued El GARIA dans la délégation de Rouhia – Siliana. Projet de promotion des filières pour le développement territorial de Siliana (PROFITS).", location: "Siliana, Tunisie" },
+    en: { title: "Erosion Control Plan - Kef RAII, Siliana", client: "PROFITS / IFAD", shortDesc: "Anti-erosion development plan, environmental impact studies of hill lakes.", longDesc: "Development of an anti-erosion plan for Kef RAII and environmental impact studies of two hill lakes on Oued Sahbi and Oued El Garia in the Rouhia delegation – Siliana. Project to promote value chains for territorial development of Siliana (PROFITS).", location: "Siliana, Tunisia" }
+  },
+  { 
+    category: "water", img: "Photos/Training%20in%20knowledge%20of%20THE%20distribution%20networks%20for%20the%20GDAs%20of%20the%20Sbikha%20Delegation%20of%20the%20the%20Governorates%20Kairouan%20and%20Sidi%20Bouzid.jpg", year: "2021",
+    fr: { title: "Formation GDA - Sbikha & Sidi Bouzid", client: "GIZ", shortDesc: "Formation en connaissance des réseaux de distribution d'eau.", longDesc: "Formation en connaissance des réseaux de distribution pour les GDA de la délégation de Sbikha du gouvernorat de Kairouan et Sidi Bouzid.", location: "Kairouan & Sidi Bouzid, Tunisie" },
+    en: { title: "GDA Training - Sbikha & Sidi Bouzid", client: "GIZ", shortDesc: "Training on water distribution networks.", longDesc: "Training on water distribution networks for Water User Associations (GDA) in Sbikha delegation (Kairouan) and Sidi Bouzid.", location: "Kairouan & Sidi Bouzid, Tunisia" }
+  },
+  { 
+    category: "water", img: "Photos/Establish%20a%20diagnosis%20of%20the%20current%20situation%20of%20public%20and%20private%20service%20offers%20in%20maintenance%20of%20the%20water%20supply%20and%20irrigation%20systems%20in%20Sidi%20Bouzid.jpg", year: "2020",
+    fr: { title: "Diagnostic des services d'eau - Sidi Bouzid", client: "GIZ", shortDesc: "Évaluation des offres de maintenance des systèmes d'eau.", longDesc: "Diagnostic de la situation actuelle des offres de services publics et privés en matière d'entretien et de maintenance des systèmes d'eau à Sidi Bouzid. Évaluation du potentiel de développement de l'employabilité du secteur de l'eau.", location: "Sidi Bouzid, Tunisie" },
+    en: { title: "Water Services Diagnosis - Sidi Bouzid", client: "GIZ", shortDesc: "Assessment of water system maintenance service offers.", longDesc: "Diagnosis of the current situation of public and private service offers for maintenance of water supply and irrigation systems in Sidi Bouzid. Assessment of the potential for employability development in the water sector.", location: "Sidi Bouzid, Tunisia" }
+  },
+  { 
+    category: "infrastructure", img: "Photos/DETAILED%20DESIGN%20OF%2080%20HA%20IIRIGATION%20%20GOLF%20LAND%20FROM%20WASTEWATER%20TREATMENT%20PLANT%20OF%20CHOTRANA.jpg", year: "2022",
+    fr: { title: "Aménagement terrain de golf - Raoued", client: "ALLIANCE FRANCE", shortDesc: "Étude d'irrigation automatique sur 80 ha, pilotage.", longDesc: "Étude d'aménagement d'un terrain de golf et pilotage automatique de l'irrigation sur 80 ha – zone de Raoued, gouvernorat de l'Ariana (GOFE 18).", location: "Ariana, Tunisie" },
+    en: { title: "Golf Course Development - Raoued", client: "ALLIANCE FRANCE", shortDesc: "Automatic irrigation study for 80 ha, control system.", longDesc: "Development study for a golf course and automatic irrigation control over 80 ha – Raoued area, Ariana governorate (GOFE 18).", location: "Ariana, Tunisia" }
+  },
+  { 
+    category: "water", img: "Photos/DAMS.jpg", year: "2019",
+    fr: { title: "Études de barrages - Bou Heurtma", client: "DGBGTH / AHT / SCP / COBA", shortDesc: "Surélévation de barrage, capacité 117 Mm³, évacuateur de crues.", longDesc: "Participation aux études de réhabilitation des grands barrages. Cas du barrage Bou Heurtma : capacité 117 Mm³, hauteur 44 m, débit laminé Q20 = 710 m³/s, débit max évacuateur Q10000 = 2660 m³/s. Modélisation hydraulique avec MECAFLUX.", location: "Tunisie" },
+    en: { title: "Dam Studies - Bou Heurtma", client: "DGBGTH / AHT / SCP / COBA", shortDesc: "Dam raising, capacity 117 Mm³, spillway design.", longDesc: "Participation in large dam rehabilitation studies. Case of Bou Heurtma dam: capacity 117 Mm³, height 44 m, routed flow Q20 = 710 m³/s, maximum spillway discharge Q10000 = 2660 m³/s. Hydraulic modeling with MECAFLUX.", location: "Tunisia" }
+  },
+  { 
+    category: "water", img: "Photos/Pumping%20Stations%20and%20modelling%20Great%20Hydraulic%20Channels.jpg", year: "2020-2022",
+    fr: { title: "Stations de pompage & modélisation", client: "DGBGTH / COBA / SCP", shortDesc: "Études des régimes transitoires, calculs génie civil.", longDesc: "Design and control of big pumping stations. Transient flow using CEBELMAIL software. Hydraulic modelling of great channels using SIC software.", location: "Tunisie" },
+    en: { title: "Pumping Stations & Modeling", client: "DGBGTH / COBA / SCP", shortDesc: "Transient flow studies, civil engineering calculations.", longDesc: "Design and control of large pumping stations. Transient flow analysis using CEBELMAIL software. Hydraulic modeling of major channels using SIC software.", location: "Tunisia" }
+  },
+  { 
+    category: "water", img: "Photos/Rural%20and%20Agricultural%20Development%20HYDRO-AGRICULTURAL%20DEVELOPMENT.jpg", year: "2021",
+    fr: { title: "Modernisation PPI Medjerda", client: "CRDA Manouba / AHT", shortDesc: "Aménagement hydro-agricole de 3000 ha, modélisation EPANET.", longDesc: "Aménagement hydro-agricole et modernisation des périmètres publics agricoles de superficies supérieures à 1000 ha. Développement d'une méthode de modélisation des réseaux des périmètres irrigués avec EPANET, appliquant une loi de distribution binomiale de débits.", location: "Medjerda, Tunisie" },
+    en: { title: "PPI Medjerda Modernization", client: "CRDA Manouba / AHT", shortDesc: "Hydro-agricultural development of 3,000 ha, EPANET modeling.", longDesc: "Hydro-agricultural development and modernization of public irrigation perimeters over 1,000 ha. Development of a method for modeling irrigation network hydraulics with EPANET, applying a binomial flow distribution law.", location: "Medjerda, Tunisia" }
+  },
+  { 
+    category: "water", img: "Photos/Evaluation%20Missions.jpg", year: "2019",
+    fr: { title: "Évaluation des périmètres irrigués - JBIC", client: "JBIC", shortDesc: "Missions d'évaluation pour le compte de bailleurs internationaux.", longDesc: "Missions d'évaluation des projets pour le compte des bailleurs de fonds : JBIC, Délégation Européenne et BAD. Évaluation des périmètres irrigués au nord de la Tunisie.", location: "Nord Tunisie" },
+    en: { title: "Irrigation Perimeter Evaluation - JBIC", client: "JBIC", shortDesc: "Evaluation missions for international donors.", longDesc: "Project evaluation missions on behalf of donors: JBIC, European Delegation, and AfDB. Evaluation of irrigation perimeters in northern Tunisia.", location: "Northern Tunisia" }
+  },
+  { 
+    category: "infrastructure", img: "Photos/Excerpt%20from%20the%20Project%20BILTINE%20IRDP.jpg", year: "2018",
+    fr: { title: "Projet Biltine - Tchad", client: "Coopération Internationale", shortDesc: "Aménagements barrages collinaires, périmètres irrigués, AEP villageoise.", longDesc: "Projets de développement rural intégré (PDRI) – Aménagements des barrages collinaires, des périmètres irrigués et de l'AEP villageoise.", location: "Biltine, Tchad" },
+    en: { title: "Biltine Project - Chad", client: "International Cooperation", shortDesc: "Hill dam development, irrigated perimeters, rural water supply.", longDesc: "Integrated rural development projects – Development of hill dams, irrigated perimeters, and village water supply.", location: "Biltine, Chad" }
+  },
+  { 
+    category: "water", img: "Photos/Excerpt%20from%20the%20Project%20Control%20of%20the%20Execution%20of%20the%20Manantali%20Pumping%20Station.jpg", year: "2020",
+    fr: { title: "Station de pompage Manantali - Mali", client: "Société de Gestion du Barrage Manantali", shortDesc: "Contrôle des travaux d'exécution, débit 3 m³/s.", longDesc: "Contrôle des travaux d'exécution de la station de pompage du périmètre irrigué à l'aval du barrage Manantali. Puissance installée 2 x 800 kVA, débit 3 m³/s.", location: "Mali" },
+    en: { title: "Manantali Pumping Station - Mali", client: "Manantali Dam Management Company", shortDesc: "Construction supervision, flow 3 m³/s.", longDesc: "Supervision of construction works for the pumping station of the irrigated perimeter downstream of Manantali Dam. Installed power 2 x 800 kVA, flow 3 m³/s.", location: "Mali" }
+  },
+  { 
+    category: "water", img: "Photos/Excerpt%20from%20the%20Project%20Control%20works%20of%20the%20Water%20Transfer%20from%20Ain%20Salah%20to%20Tamanrasset.jpg", year: "2014-2015",
+    fr: { title: "Transfert Ain Salah - Tamanrasset", client: "STUCKY Suisse", shortDesc: "Supervision pose conduites acier DN900, 1200 km, désert algérien.", longDesc: "Supervision des travaux de pose de deux conduites en acier DN 900, PN 40-15 bars, débit 1 m³/s dans le désert d'Algérie. Tronçon 3.2 : ARAK-AIN MGUEL de longueur 300 km.", location: "Algérie" },
+    en: { title: "Ain Salah - Tamanrasset Transfer", client: "STUCKY Switzerland", shortDesc: "Supervision of DN900 steel pipeline laying, 1200 km, Algerian desert.", longDesc: "Supervision of the laying of two DN900 steel pipelines, PN 40-15 bar, flow 1 m³/s in the Algerian desert. Section 3.2: ARAK-AIN MGUEL, length 300 km.", location: "Algeria" }
+  },
+  { 
+    category: "infrastructure", img: "Photos/Project%20Excerpt%20Control%20of%20the%20KANYOSHA%20River%20Works.jpg", year: "2011",
+    fr: { title: "Aménagement rivière Kanyosha - Burundi", client: "Coopération Internationale", shortDesc: "Contrôle des travaux d'aménagement des ravins et rivières.", longDesc: "Contrôle des travaux d'aménagement des ravins et des rivières de la Muha et de la KANYOSHA à Bujumbura.", location: "Bujumbura, Burundi" },
+    en: { title: "Kanyosha River Development - Burundi", client: "International Cooperation", shortDesc: "Supervision of gully and river development works.", longDesc: "Supervision of development works for gullies and rivers of Muha and Kanyosha in Bujumbura.", location: "Bujumbura, Burundi" }
+  },
+  { 
+    category: "infrastructure", img: "Photos/DEVELOPMENT%20STUDY%20FOR%20A%20COMMERCIAL%20AND%20URBAN%20COMPLEX%20IN%20TOBRUK.png", year: "2021",
+    fr: { title: "Route Tijikja-Keddia - Mauritanie", client: "DG-Infrastructures de Transport Routier (Mauritanie)", shortDesc: "Études hydrauliques et environnementales pour aménagement routier (70 km).", longDesc: "Aménagement de la route Tijikja-Keddia (70 km). Études hydrauliques et environnementales des écoulements traversant la route projetée, choix du tracé, études hydrologiques des bassins versants, dimensionnement hydraulique des ouvrages, élaboration du plan de gestion environnementale.", location: "Mauritanie" },
+    en: { title: "Tijikja-Keddia Road - Mauritania", client: "DG of Road Transport Infrastructure (Mauritania)", shortDesc: "Hydraulic and environmental studies for road development (70 km).", longDesc: "Development of the Tijikja-Keddia road (70 km). Hydraulic and environmental studies of flows crossing the proposed road, route selection, hydrological studies of watersheds, hydraulic design of structures, development of the environmental management plan.", location: "Mauritania" }
+  },
+  { 
+    category: "water", img: "Photos/Excerpt%20from%20the%20Project%20YAOUNDE.jpg", year: "2022",
+    fr: { title: "Usine de traitement MEFOU - Cameroun", client: "CAMWATER", shortDesc: "Contrôle de l'étude du design de l'usine de traitement des eaux (50 000 m³/j).", longDesc: "Contrôle de l'exécution de l'étude du design de l'usine de traitement des eaux en aval du barrage du MEFOU (50 000 m³/jour).", location: "Cameroun" },
+    en: { title: "MEFOU Water Treatment Plant - Cameroon", client: "CAMWATER", shortDesc: "Review of the design study for the water treatment plant (50,000 m³/d).", longDesc: "Review of the execution of the design study for the water treatment plant downstream of the MEFOU dam (50,000 m³/day).", location: "Cameroon" }
+  },
+  { 
+    category: "water", img: "Photos/Pumping%20Stations%20and%20modelling%20Great%20Hydraulic%20Channels.jpg", year: "2020",
+    fr: { title: "Aménagement hydro-agricole KRAMIS - Algérie", client: "ONID", shortDesc: "Aménagement de périmètres irrigués (4500 ha) à partir du barrage de KRAMIS.", longDesc: "Développement rural et agricole : aménagement hydro-agricole de périmètres de 4500 ha à partir du barrage de KRAMIS.", location: "Algérie" },
+    en: { title: "KRAMIS Hydro-Agricultural Development - Algeria", client: "ONID", shortDesc: "Development of irrigated perimeters (4,500 ha) from KRAMIS dam.", longDesc: "Rural and agricultural development: hydro-agricultural development of 4,500 ha perimeters from KRAMIS dam.", location: "Algeria" }
+  },
+  { 
+    category: "water", img: "Photos/Rural%20and%20Agricultural%20Development%20HYDRO-AGRICULTURAL%20DEVELOPMENT.jpg", year: "2019-2022",
+    fr: { title: "Réhabilitation des périmètres irrigués - Algérie", client: "ONID / BRLI", shortDesc: "Réhabilitation de 3 grands périmètres irrigués (Bouneamoussa, Boumerdes, M'chedallah).", longDesc: "Réhabilitation et modernisation des périmètres irrigués des barrages de : BOUNEMMOUSSA (16 500 ha), BOUMERDES (4 000 ha), M'CHEDALLAH (1 400 ha).", location: "Algérie" },
+    en: { title: "Rehabilitation of Irrigated Perimeters - Algeria", client: "ONID / BRLI", shortDesc: "Rehabilitation of 3 large irrigated perimeters (Bouneamoussa, Boumerdes, M'chedallah).", longDesc: "Rehabilitation and modernization of irrigated perimeters of dams: BOUNEMMOUSSA (16,500 ha), BOUMERDES (4,000 ha), M'CHEDALLAH (1,400 ha).", location: "Algeria" }
+  }
+];
+
+// Ajout de la propriété 'scope' (national / international)
+const projects = projectsRaw.map(p => {
+    const loc = p.fr.location.toLowerCase();
+    const isNational = loc.includes('tunisie') || loc.includes('tunisia') || loc.includes('bizerte') || loc.includes('kasserine') || loc.includes('siliana') || loc.includes('medjerda') || loc.includes('ariana') || loc.includes('sidi bouzid') || loc.includes('kairouan') || loc === 'tunisie' || loc === 'nord tunisie';
+    return { ...p, scope: isNational ? 'national' : 'international' };
+});
+
+let currentLang = 'fr';
+let currentCategory = 'water';
+let currentScope = null;
+
+function renderProjects() {
+    const filtered = projects.filter(p => {
+        if (p.category !== currentCategory) return false;
+        if (currentScope && p.scope !== currentScope) return false;
+        return true;
+    });
+    const grid = document.getElementById('projectsGrid');
+    grid.innerHTML = filtered.map((p, idx) => {
+        const data = p[currentLang];
+        return `<div class="project-card" data-idx="${idx}"><div class="project-image" style="background-image:url('${p.img}'); background-size:cover; background-position:center;"></div><div class="project-content"><span class="project-category">${p.category === "water" ? (currentLang === 'fr' ? "Hydraulique" : "Hydraulics") : p.category === "environment" ? (currentLang === 'fr' ? "Environnement" : "Environment") : (currentLang === 'fr' ? "Infrastructures" : "Infrastructure")}</span><h3 class="project-title">${data.title}</h3><p class="project-client">${data.client}</p><p>${data.shortDesc.substring(0, 100)}${data.shortDesc.length > 100 ? "..." : ""}</p></div></div>`;
+    }).join('');
+    document.querySelectorAll('.project-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            const idx = card.dataset.idx;
+            const proj = filtered[idx];
+            openModal(proj);
+        });
+    });
+}
+
+function openModal(proj) {
+    const modal = document.getElementById('projectModal');
+    const data = proj[currentLang];
+    modal.querySelector('.modal-image').style.backgroundImage = `url('${proj.img}')`;
+    modal.querySelector('.modal-title').innerText = data.title;
+    modal.querySelector('.modal-client').innerHTML = `<strong>${currentLang === 'fr' ? 'Client :' : 'Client:'}</strong> ${data.client}`;
+    modal.querySelector('.modal-desc').innerHTML = `<strong>${currentLang === 'fr' ? 'Description :' : 'Description:'}</strong> ${data.longDesc}`;
+    modal.querySelector('.modal-year').innerHTML = `<strong>${currentLang === 'fr' ? 'Année :' : 'Year:'}</strong> ${proj.year}`;
+    modal.querySelector('.modal-location').innerHTML = `<strong>${currentLang === 'fr' ? 'Localisation :' : 'Location:'}</strong> ${data.location}`;
+    modal.classList.add('active');
+}
+
+function initFilters() {
+    const catBtns = document.querySelectorAll('#categoryFilters .filter-btn');
+    const scopeContainer = document.getElementById('scopeFilters');
+    const scopeBtns = document.querySelectorAll('#scopeFilters .sub-filter-btn');
+
+    function updateActiveCategory(activeCat) {
+        catBtns.forEach(btn => {
+            if (btn.dataset.cat === activeCat) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+        currentCategory = activeCat;
+        currentScope = null;
+        scopeBtns.forEach(btn => btn.classList.remove('active'));
+        renderProjects();
+    }
+
+    catBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            updateActiveCategory(btn.dataset.cat);
+        });
+    });
+
+    scopeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const newScope = btn.dataset.scope;
+            if (currentScope === newScope) {
+                currentScope = null;
+                btn.classList.remove('active');
+            } else {
+                currentScope = newScope;
+                scopeBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+            renderProjects();
+        });
+    });
+
+    scopeContainer.style.display = 'flex';
+    updateActiveCategory('water');
+}
+
+// Langue
+function setLanguage(lang) {
+    currentLang = lang;
+    document.querySelectorAll('[data-fr][data-en]').forEach(el => {
+        el.innerText = lang === 'fr' ? el.getAttribute('data-fr') : el.getAttribute('data-en');
+    });
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        if (btn.getAttribute('data-lang') === lang) btn.classList.add('active');
+        else btn.classList.remove('active');
+    });
+    renderProjects();
+    if (window.updateMapLanguage) window.updateMapLanguage(lang);
+}
+
+// Carte Afrique avec fond CartoDB Light (fiable)
+let map;
+function initMap() {
+    map = L.map('africaMap').setView([5.0, 20.0], 4);
+    
+    // FOND DE CARTE STABLE : CartoDB Light (contient les frontières)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; CartoDB',
+        subdomains: 'abcd',
+        maxZoom: 19
+    }).addTo(map);
+    
+    // Récupération des frontières africaines (fichier local recommandé, fallback GitHub)
+    fetch('Afrique/africa.geojson')
+        .then(res => res.ok ? res.json() : Promise.reject())
+        .then(data => {
+            L.geoJSON(data, {
+                style: { color: "#4a6b8f", weight: 1.5, fillColor: "#eef3fc", fillOpacity: 0.3, opacity: 0.8 }
+            }).addTo(map);
+        })
+        .catch(() => {
+            console.warn("Fichier GeoJSON local non trouvé, utilisation d'un fallback externe.");
+            fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
+                .then(res => res.json())
+                .then(data => {
+                    const africanNames = ["Algeria","Angola","Benin","Botswana","Burkina Faso","Burundi","Cabo Verde","Cameroon","Central African Republic","Chad","Comoros","Congo","Democratic Republic of the Congo","Djibouti","Egypt","Equatorial Guinea","Eritrea","Eswatini","Ethiopia","Gabon","Gambia","Ghana","Guinea","Guinea-Bissau","Ivory Coast","Kenya","Lesotho","Liberia","Libya","Madagascar","Malawi","Mali","Mauritania","Mauritius","Morocco","Mozambique","Namibia","Niger","Nigeria","Rwanda","Sao Tome and Principe","Senegal","Seychelles","Sierra Leone","Somalia","South Africa","South Sudan","Sudan","Tanzania","Togo","Tunisia","Uganda","Zambia","Zimbabwe"];
+                    const africanGeoJSON = { type: "FeatureCollection", features: data.features.filter(f => africanNames.includes(f.properties?.ADMIN)) };
+                    L.geoJSON(africanGeoJSON, { style: { color: "#4a6b8f", weight: 1.5, fillColor: "#eef3fc", fillOpacity: 0.3, opacity: 0.8 } }).addTo(map);
+                })
+                .catch(() => console.warn("Impossible de charger les frontières, mais le fond de carte reste visible."));
+        });
+    
+    const starIcon = L.divIcon({
+        html: '<div style="background: radial-gradient(circle, #ffd966, #ffb347); border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.4); border: 2px solid white;"><i class="fas fa-star" style="color: #FFD700; font-size: 18px; text-shadow: 0 0 3px #000;"></i></div>',
+        className: 'custom-star-marker',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15],
+        popupAnchor: [0, -15]
+    });
+    const countriesData = computeInterventionCountries();
+    countriesData.forEach(c => {
+        const marker = L.marker([c.lat, c.lng], { icon: starIcon }).addTo(map);
+        marker.bindPopup(`<b>${c.fr}</b><br>⭐ ${c.count} intervention(s) iGC`);
+    });
+    updateCountryLegend('fr');
+    window.updateMapLanguage = function(lang) {
+        updateCountryLegend(lang);
+        map.eachLayer(layer => {
+            if (layer instanceof L.Marker && layer.getPopup()) {
+                const latlng = layer.getLatLng();
+                const found = countriesData.find(c => Math.abs(c.lat - latlng.lat) < 0.5 && Math.abs(c.lng - latlng.lng) < 0.5);
+                if (found) layer.getPopup().setContent(`<b>${lang === 'fr' ? found.fr : found.en}</b><br>⭐ ${found.count} intervention(s) iGC`);
+            }
+        });
+    };
+    
+    // Forcer le recalcul de la taille de la carte après chargement complet
+    setTimeout(() => map.invalidateSize(), 300);
+    window.addEventListener('load', () => map.invalidateSize());
+    window.addEventListener('resize', () => map.invalidateSize());
+}
+
+function computeInterventionCountries() {
+    const countriesMap = {
+        "Tunisie": { fr: "Tunisie", en: "Tunisia", lat: 34.0, lng: 9.0, count: 0 },
+        "Libye": { fr: "Libye", en: "Libya", lat: 28.0, lng: 17.0, count: 0 },
+        "Congo": { fr: "Congo", en: "Congo", lat: -1.0, lng: 15.0, count: 0 },
+        "Cameroun": { fr: "Cameroun", en: "Cameroon", lat: 5.0, lng: 12.0, count: 0 },
+        "Guinée": { fr: "Guinée", en: "Guinea", lat: 9.5, lng: -10.0, count: 0 },
+        "Côte d'Ivoire": { fr: "Côte d'Ivoire", en: "Ivory Coast", lat: 7.5, lng: -5.5, count: 0 },
+        "Sénégal": { fr: "Sénégal", en: "Senegal", lat: 14.5, lng: -14.5, count: 0 },
+        "Mali": { fr: "Mali", en: "Mali", lat: 17.5, lng: -3.5, count: 0 },
+        "Tchad": { fr: "Tchad", en: "Chad", lat: 15.0, lng: 19.0, count: 0 },
+        "Burundi": { fr: "Burundi", en: "Burundi", lat: -3.5, lng: 30.0, count: 0 },
+        "Algérie": { fr: "Algérie", en: "Algeria", lat: 28.0, lng: 3.0, count: 0 },
+        "Mauritanie": { fr: "Mauritanie", en: "Mauritania", lat: 21.0, lng: -10.0, count: 0 }
+    };
+    const keywords = {
+        "Tunisie": /Tunisie|Tunisia|Bizerte|Kasserine|Siliana|Medjerda|Ariana|Sidi Bouzid|Kairouan/i,
+        "Libye": /Libye|Libya|Tobrouk|Benghazi/i,
+        "Congo": /Congo|Oyo|Brazzaville/i,
+        "Cameroun": /Cameroun|Cameroon|Yaoundé|MEFOU/i,
+        "Guinée": /Guinée|Guinea|Boké/i,
+        "Côte d'Ivoire": /Côte d'Ivoire|Ivory Coast|Korhogo/i,
+        "Sénégal": /Sénégal|Senegal|Lac Guier|PREFERLO/i,
+        "Mali": /Mali|Manantali/i,
+        "Tchad": /Tchad|Chad|Biltine/i,
+        "Burundi": /Burundi|Bujumbura|Kanyosha/i,
+        "Algérie": /Algérie|Algeria|Tamanrasset|Ain Salah|KRAMIS|BOUNEMMOUSSA|BOUMERDES/i,
+        "Mauritanie": /Mauritanie|Mauritania|Tijikja|Keddia/i
+    };
+    projects.forEach(p => {
+        const text = (p.fr.location + " " + p.fr.title + " " + p.fr.client).toLowerCase();
+        for (let [country, regex] of Object.entries(keywords)) {
+            if (regex.test(text)) countriesMap[country].count++;
+        }
+    });
+    if (countriesMap["Tunisie"].count === 0) countriesMap["Tunisie"].count = 12;
+    return Object.values(countriesMap).filter(c => c.count > 0);
+}
+
+function updateCountryLegend(lang) {
+    const container = document.getElementById('countryLegendContainer');
+    if (!container) return;
+    const countries = computeInterventionCountries();
+    const countryNames = countries.map(c => c[lang === 'fr' ? 'fr' : 'en']);
+    container.innerHTML = countryNames.map(name => `<span><i class="fas fa-star" style="color:#fbbf24; font-size:0.8rem;"></i> ${name}</span>`).join('');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initFilters();
+    initMap();
+
+    // Gestion modale
+    document.getElementById('projectModal').querySelector('.modal-close').addEventListener('click', () => document.getElementById('projectModal').classList.remove('active'));
+    document.getElementById('projectModal').addEventListener('click', (e) => { if(e.target === document.getElementById('projectModal')) document.getElementById('projectModal').classList.remove('active'); });
+
+    // PDF
+    const pdfModal = document.getElementById('pdfModal'), pdfIframe = document.getElementById('pdfIframe');
+    function showPDF(p) { pdfIframe.src = p; pdfModal.classList.add('active'); }
+    pdfModal.querySelector('.modal-close').addEventListener('click', () => pdfModal.classList.remove('active'));
+    document.getElementById('viewBrochureFr').onclick = () => showPDF('Plaquettes/Plaquette iGC-Français-JANV-2026.pdf');
+    document.getElementById('viewBrochureEn').onclick = () => showPDF('Plaquettes/Plaquette iGC-ANglais -2025.pdf');
+
+    // Partenaires
+    const partnersList = [ { name: "ANPE", file: "ANPE.jpg" }, { name: "Banque Européenne d'Investissement", file: "BANQUE EUROPEENNE D'IVESTISSEMENT.png" }, { name: "BERD", file: "BERD.png" }, { name: "CAMWATER", file: "CAMWATER.png" }, { name: "DGBGTH", file: "DGBGTH.png" }, { name: "EUROMED", file: "EUROMED.jpg" }, { name: "GIZ", file: "giz.jpg" }, { name: "Ministère de l'Agriculture", file: "Logo_Ministère_de_l'Agriculture_(Tunisie).png" }, { name: "Ministère de l'Environnement", file: "M.environnement.jpg" }, { name: "SONEDE", file: "SONEDE.png" } ];
+    const track = document.getElementById('partnerTrack'); if(track) { let html = ''; for (let i = 0; i < 2; i++) { partnersList.forEach(p => { html += `<div class="partner-logo"><img src="Logos/${p.file}" alt="${p.name}" loading="lazy" onerror="this.onerror=null; this.style.display='none';"><span style="display:none;">${p.name}</span></div>`; }); } track.innerHTML = html; }
+
+    // Langue
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.addEventListener('click', () => setLanguage(btn.getAttribute('data-lang'))));
+    setLanguage('fr');
+
+    // Animations, back to top, mobile menu
+    const animateElements = document.querySelectorAll('.animate-on-scroll');
+    const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('animate'); observer.unobserve(entry.target); } }); }, { threshold: 0.2 });
+    animateElements.forEach(el => observer.observe(el));
+    const backToTop = document.getElementById('backToTop'); window.addEventListener('scroll', () => { if (window.scrollY > 300) backToTop.classList.add('show'); else backToTop.classList.remove('show'); }); backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    const mobileMenuBtn = document.querySelector('.mobile-menu'), closeMenuBtn = document.querySelector('.close-menu'), mobileNav = document.querySelector('.mobile-nav'), overlayMenu = document.querySelector('.overlay');
+    function closeMobile() { mobileNav.classList.remove('active'); overlayMenu.classList.remove('active'); document.body.style.overflow = 'auto'; }
+    mobileMenuBtn.addEventListener('click', () => { mobileNav.classList.add('active'); overlayMenu.classList.add('active'); document.body.style.overflow = 'hidden'; });
+    closeMenuBtn.addEventListener('click', closeMobile); overlayMenu.addEventListener('click', closeMobile);
+    window.addEventListener('scroll', () => document.getElementById('header').classList.toggle('scrolled', window.scrollY > 80));
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => { anchor.addEventListener('click', function(e) { e.preventDefault(); const target = document.querySelector(this.getAttribute('href')); if(target) { window.scrollTo({ top: target.offsetTop - 80, behavior: 'smooth' }); closeMobile(); } }); });
+    document.getElementById('contactForm').addEventListener('submit', (e) => { e.preventDefault(); alert("Merci ! Votre message a été envoyé. Nous vous répondrons dans les meilleurs délais."); e.target.reset(); });
+});
+</script>
+</body>
+</html>
